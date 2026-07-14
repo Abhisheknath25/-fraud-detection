@@ -5,6 +5,18 @@ real time. It trains a classification model on the [Kaggle Credit Card Fraud
 Detection](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud) dataset and
 exposes it through a **FastAPI** REST API with a sleek web interface.
 
+> ### 🌐 Live Demo
+>
+> The model is **deployed and live** on Render:
+>
+> 🔗 **[https://fraud-detection-api.onrender.com](https://fraud-detection-api.onrender.com)**
+>
+> - **Web UI**: [https://fraud-detection-api.onrender.com](https://fraud-detection-api.onrender.com)
+> - **Swagger Docs**: [https://fraud-detection-api.onrender.com/docs](https://fraud-detection-api.onrender.com/docs)
+> - **Health Check**: [https://fraud-detection-api.onrender.com/health](https://fraud-detection-api.onrender.com/health)
+>
+> *Note: Free tier may take ~30s to wake up on first request after inactivity.*
+
 ---
 
 ## 📋 Features
@@ -61,10 +73,10 @@ Navigate to **http://127.0.0.1:8000** in your browser.
 | `/model-info` | GET | Training metrics for the loaded model |
 | `/docs` | GET | Interactive Swagger documentation |
 
-### Example Request
+### Example Request (Live API)
 
 ```bash
-curl -X POST http://127.0.0.1:8000/predict \
+curl -X POST https://fraud-detection-api.onrender.com/predict \
   -H "Content-Type: application/json" \
   -d '{"features": [0, -1.36, -0.07, 2.54, 1.38, -0.34, 0.46, 0.24, 0.10, 0.36, 0.09, -0.55, -0.62, -0.99, -0.31, 1.47, -0.47, 0.21, 0.03, 0.40, 0.25, -0.02, 0.28, -0.11, 0.07, 0.13, -0.19, 0.13, 149.62]}'
 ```
@@ -96,6 +108,7 @@ curl -X POST http://127.0.0.1:8000/predict \
 ├── templates/
 │   └── index.html         Web testing interface
 ├── requirements.txt       Python dependencies
+├── render.yaml            Render deployment config
 ├── run.py                 Entry point
 └── README.md              This file
 ```
@@ -124,6 +137,22 @@ Options:
   --host TEXT     API host (default: 127.0.0.1)
   --port INT      API port (default: 8000)
 ```
+
+---
+
+## ☁️ Deployment
+
+This project is deployed on **[Render](https://render.com)** using the free tier.
+
+| Detail | Value |
+|--------|-------|
+| **Platform** | Render |
+| **URL** | [https://fraud-detection-api.onrender.com](https://fraud-detection-api.onrender.com) |
+| **Runtime** | Python 3.10 |
+| **Config** | `render.yaml` |
+| **Repo** | [GitHub](https://github.com/Abhisheknath25/-fraud-detection) |
+
+To redeploy, simply push to the `main` branch — Render auto-deploys on every push.
 
 ---
 
