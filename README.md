@@ -55,11 +55,11 @@ This will:
 1. Load and preprocess the dataset
 2. Train 3 models and select the best one
 3. Save the model to `models/fraud_model.pkl`
-4. Start the API server at `http://127.0.0.1:8000`
+4. Start the API server at `https://fraud-detection-api.onrender.com`
 
 ### 4. Open the web UI
 
-Navigate to **http://127.0.0.1:8000** in your browser.
+Navigate to **https://fraud-detection-api.onrender.com** in your browser.
 
 ---
 
