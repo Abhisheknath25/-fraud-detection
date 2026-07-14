@@ -344,7 +344,15 @@
             if(isNaN(amount)) { alert("Please enter a valid amount"); return; }
             
             const profileKey = document.getElementById('txProfile').value;
-            const profileVector = PROFILES[profileKey];
+            let profileVector = PROFILES[profileKey];
+            
+            // Robustly guarantee exactly 28 PCA features so the final array is exactly 30 elements
+            if (profileVector.length > 28) {
+                profileVector = profileVector.slice(0, 28);
+            }
+            while (profileVector.length < 28) {
+                profileVector.push(0.0);
+            }
             
             // Construct the 30-feature vector expected by the API:
             // [Time, V1...V28, Amount]
