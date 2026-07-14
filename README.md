@@ -9,11 +9,11 @@ exposes it through a **FastAPI** REST API with a sleek web interface.
 >
 > The model is **deployed and live** on Render:
 >
-> 🔗 **[https://fraud-detection-api.onrender.com](https://fraud-detection-api.onrender.com)**
+> 🔗 **[https://fraud-detection-api-zttp.onrender.com](https://fraud-detection-api-zttp.onrender.com)**
 >
-> - **Web UI**: [https://fraud-detection-api.onrender.com](https://fraud-detection-api.onrender.com)
-> - **Swagger Docs**: [https://fraud-detection-api.onrender.com/docs](https://fraud-detection-api.onrender.com/docs)
-> - **Health Check**: [https://fraud-detection-api.onrender.com/health](https://fraud-detection-api.onrender.com/health)
+> - **Web UI**: [https://fraud-detection-api-zttp.onrender.com](https://fraud-detection-api-zttp.onrender.com)
+> - **Swagger Docs**: [https://fraud-detection-api-zttp.onrender.com/docs](https://fraud-detection-api-zttp.onrender.com/docs)
+> - **Health Check**: [https://fraud-detection-api-zttp.onrender.com/health](https://fraud-detection-api-zttp.onrender.com/health)
 >
 > *Note: Free tier may take ~30s to wake up on first request after inactivity.*
 
@@ -55,11 +55,11 @@ This will:
 1. Load and preprocess the dataset
 2. Train 3 models and select the best one
 3. Save the model to `models/fraud_model.pkl`
-4. Start the API server at `https://fraud-detection-api.onrender.com`
+4. Start the API server at `https://fraud-detection-api-zttp.onrender.com`
 
 ### 4. Open the web UI
 
-Navigate to **https://fraud-detection-api.onrender.com** in your browser.
+Navigate to **https://fraud-detection-api-zttp.onrender.com** in your browser.
 
 ---
 
@@ -76,7 +76,7 @@ Navigate to **https://fraud-detection-api.onrender.com** in your browser.
 ### Example Request (Live API)
 
 ```bash
-curl -X POST https://fraud-detection-api.onrender.com/predict \
+curl -X POST https://fraud-detection-api-zttp.onrender.com/predict \
   -H "Content-Type: application/json" \
   -d '{"features": [0, -1.36, -0.07, 2.54, 1.38, -0.34, 0.46, 0.24, 0.10, 0.36, 0.09, -0.55, -0.62, -0.99, -0.31, 1.47, -0.47, 0.21, 0.03, 0.40, 0.25, -0.02, 0.28, -0.11, 0.07, 0.13, -0.19, 0.13, 149.62]}'
 ```
@@ -147,7 +147,7 @@ This project is deployed on **[Render](https://render.com)** using the free tier
 | Detail | Value |
 |--------|-------|
 | **Platform** | Render |
-| **URL** | [https://fraud-detection-api.onrender.com](https://fraud-detection-api.onrender.com) |
+| **URL** | [https://fraud-detection-api-zttp.onrender.com](https://fraud-detection-api-zttp.onrender.com) |
 | **Runtime** | Python 3.10 |
 | **Config** | `render.yaml` |
 | **Repo** | [GitHub](https://github.com/Abhisheknath25/-fraud-detection) |
