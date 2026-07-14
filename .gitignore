@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environments
+venv/
+env/
+.env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Large data files (exceed GitHub 100MB limit)
+*.csv
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Agents
+.agents/

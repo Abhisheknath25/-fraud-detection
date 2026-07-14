@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fraud Detection System — Credit Card Transactions</title>
+    <meta name="description" content="Real-time credit card fraud detection powered by machine learning. Analyze transactions instantly.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================================
+           CSS DESIGN SYSTEM
+           ============================================================ */
+        :root {
+            --bg-primary: #0a0e1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a1f35;
+            --bg-card-hover: #222845;
+            --bg-input: #0d1225;
+            --border-subtle: rgba(255, 255, 255, 0.06);
+            --border-focus: #6366f1;
+
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+
+            --accent-indigo: #6366f1;
+            --accent-indigo-glow: rgba(99, 102, 241, 0.25);
+            --accent-cyan: #22d3ee;
+            --accent-green: #34d399;
+            --accent-red: #f87171;
+            --accent-amber: #fbbf24;
+
+            --gradient-hero: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a78bfa 100%);
+            --gradient-danger: linear-gradient(135deg, #ef4444, #f87171);
+            --gradient-safe: linear-gradient(135deg, #059669, #34d399);
+            --gradient-warn: linear-gradient(135deg, #d97706, #fbbf24);
+
+            --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.4);
+            --shadow-glow: 0 0 40px rgba(99, 102, 241, 0.15);
+
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* ---- Animated background ---- */
+        .bg-effects {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .bg-effects .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.12;
+            animation: orbit 20s ease-in-out infinite alternate;
+        }
+        .bg-effects .orb:nth-child(1) {
+            width: 600px; height: 600px;
+            background: #6366f1;
+            top: -10%; left: -5%;
+        }
+        .bg-effects .orb:nth-child(2) {
+            width: 500px; height: 500px;
+            background: #22d3ee;
+            bottom: -15%; right: -10%;
+            animation-delay: -7s;
+            animation-duration: 25s;
+        }
+        .bg-effects .orb:nth-child(3) {
+            width: 350px; height: 350px;
+            background: #a78bfa;
+            top: 40%; left: 50%;
+            animation-delay: -12s;
+            animation-duration: 30s;
+        }
+        @keyframes orbit {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(60px, -40px) scale(1.1); }
+            100% { transform: translate(-30px, 50px) scale(0.95); }
+        }
+
+        /* ---- Layout ---- */
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+        }
+
+        /* ---- Header ---- */
+        header {
+            text-align: center;
+            padding: 3rem 0 2rem;
+        }
+        .logo-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(99, 102, 241, 0.12);
+            border: 1px solid rgba(99, 102, 241, 0.25);
+            padding: 0.4rem 1rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--accent-indigo);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 1.25rem;
+        }
+        .logo-badge .dot {
+            width: 8px; height: 8px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.4); }
+        }
+        header h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 800;
+            background: var(--gradient-hero);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.15;
+            margin-bottom: 0.75rem;
+        }
+        header p {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            max-width: 580px;
+            margin: 0 auto;
+        }
+
+        /* ---- Status bar ---- */
+        .status-bar {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        .status-item .indicator {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+        }
+        .status-item .indicator.green { background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); }
+        .status-item .indicator.amber { background: var(--accent-amber); box-shadow: 0 0 8px var(--accent-amber); }
+        .status-item .indicator.red   { background: var(--accent-red);   box-shadow: 0 0 8px var(--accent-red); }
+
+        /* ---- Cards ---- */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            backdrop-filter: blur(12px);
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .card:hover {
+            border-color: rgba(99, 102, 241, 0.18);
+            box-shadow: var(--shadow-glow);
+        }
+        .card-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .card-title .icon {
+            font-size: 1.3rem;
+        }
+
+        /* ---- Grid layout ---- */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        @media (max-width: 768px) {
+            .grid-2 { grid-template-columns: 1fr; }
+        }
+
+        /* ---- Form ---- */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 0.6rem;
+        }
+        .feature-field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+        .feature-field label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .feature-field input {
+            width: 100%;
+            padding: 0.5rem 0.6rem;
+            background: var(--bg-input);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-family: var(--font);
+            font-size: 0.85rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+        .feature-field input:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px var(--accent-indigo-glow);
+        }
+        .feature-field input::placeholder {
+            color: var(--text-muted);
+            opacity: 0.6;
+        }
+
+        /* ---- Buttons ---- */
+        .btn-row {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.7rem 1.4rem;
+            border: none;
+            border-radius: var(--radius-md);
+            font-family: var(--font);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.25s, opacity 0.2s;
+        }
+        .btn:active { transform: scale(0.97); }
+        .btn-primary {
+            background: var(--gradient-hero);
+            color: #fff;
+            box-shadow: 0 4px 20px var(--accent-indigo-glow);
+        }
+        .btn-primary:hover { box-shadow: 0 6px 30px rgba(99, 102, 241, 0.4); }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-subtle);
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.1); color: var(--text-primary); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* ---- Result panel ---- */
+        .result-panel {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 320px;
+        }
+        .result-panel.visible { display: flex; }
+
+        .result-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 0.35rem 1rem;
+            border-radius: 999px;
+            margin-bottom: 1rem;
+        }
+        .result-badge.safe {
+            background: rgba(52, 211, 153, 0.15);
+            color: var(--accent-green);
+            border: 1px solid rgba(52, 211, 153, 0.3);
+        }
+        .result-badge.danger {
+            background: rgba(248, 113, 113, 0.15);
+            color: var(--accent-red);
+            border: 1px solid rgba(248, 113, 113, 0.3);
+        }
+        .result-badge.warning {
+            background: rgba(251, 191, 36, 0.15);
+            color: var(--accent-amber);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+
+        .result-icon {
+            font-size: 4rem;
+            margin-bottom: 0.5rem;
+            animation: result-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes result-pop {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .result-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-bottom: 0.25rem;
+        }
+        .result-title.safe { color: var(--accent-green); }
+        .result-title.danger { color: var(--accent-red); }
+        .result-title.warning { color: var(--accent-amber); }
+
+        .result-prob {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        /* probability bar */
+        .prob-bar-container {
+            width: 100%;
+            max-width: 320px;
+            margin-bottom: 1.5rem;
+        }
+        .prob-bar-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 0.3rem;
+        }
+        .prob-bar {
+            height: 10px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+        .prob-bar-fill {
+            height: 100%;
+            border-radius: 999px;
+            transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .prob-bar-fill.safe   { background: var(--gradient-safe); }
+        .prob-bar-fill.danger { background: var(--gradient-danger); }
+        .prob-bar-fill.warning { background: var(--gradient-warn); }
+
+        /* ---- Waiting state ---- */
+        .waiting-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 320px;
+            color: var(--text-muted);
+        }
+        .waiting-panel .icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.4; }
+        .waiting-panel p { font-size: 0.95rem; }
+
+        /* ---- Spinner ---- */
+        .spinner {
+            display: none;
+            width: 40px; height: 40px;
+            border: 3px solid var(--border-subtle);
+            border-top-color: var(--accent-indigo);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin-bottom: 1rem;
+        }
+        .spinner.visible { display: block; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ---- Error toast ---- */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(120%);
+            background: #1e293b;
+            color: var(--text-primary);
+            padding: 0.8rem 1.5rem;
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(248, 113, 113, 0.3);
+            font-size: 0.85rem;
+            z-index: 100;
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: var(--shadow-lg);
+        }
+        .toast.visible {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ---- Footer ---- */
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            border-top: 1px solid var(--border-subtle);
+            margin-top: 3rem;
+        }
+        footer a {
+            color: var(--accent-indigo);
+            text-decoration: none;
+        }
+        footer a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<!-- Animated background -->
+<div class="bg-effects">
+    <div class="orb"></div>
+    <div class="orb"></div>
+    <div class="orb"></div>
+</div>
+
+<div class="container">
+
+    <!-- Header -->
+    <header>
+        <div class="logo-badge">
+            <span class="dot"></span>
+            Fraud Detection System
+        </div>
+        <h1>Credit Card<br>Fraud Detection</h1>
+        <p>Real-time transaction analysis powered by machine learning.
+           Submit transaction features below to instantly detect suspicious activity.</p>
+    </header>
+
+    <!-- Status bar -->
+    <div class="status-bar" id="statusBar">
+        <div class="status-item">
+            <span class="indicator amber" id="apiIndicator"></span>
+            <span id="apiStatusText">Checking API…</span>
+        </div>
+        <div class="status-item">
+            <span class="indicator amber" id="modelIndicator"></span>
+            <span id="modelStatusText">Checking model…</span>
+        </div>
+    </div>
+
+    <!-- Main grid -->
+    <div class="grid-2">
+
+        <!-- LEFT: Input card -->
+        <div class="card" id="inputCard">
+            <div class="card-title">
+                <span class="icon">📊</span>
+                Transaction Features
+            </div>
+
+            <form id="predictionForm">
+                <div class="feature-grid" id="featureGrid">
+                    <!-- Generated by JS -->
+                </div>
+
+                <div class="btn-row">
+                    <button type="submit" class="btn btn-primary" id="predictBtn">
+                        🔍 Analyze Transaction
+                    </button>
+                    <button type="button" class="btn btn-secondary" id="sampleBtn">
+                        🎲 Load Sample
+                    </button>
+                    <button type="button" class="btn btn-secondary" id="clearBtn">
+                        ✕ Clear
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- RIGHT: Result card -->
+        <div class="card">
+            <div class="card-title">
+                <span class="icon">🛡️</span>
+                Analysis Result
+            </div>
+
+            <!-- Waiting state -->
+            <div class="waiting-panel" id="waitingPanel">
+                <div class="icon">📋</div>
+                <p>Enter transaction features and click<br><strong>Analyze Transaction</strong> to see results.</p>
+            </div>
+
+            <!-- Loading state -->
+            <div class="result-panel" id="loadingPanel">
+                <div class="spinner visible"></div>
+                <p style="color: var(--text-muted);">Analyzing transaction…</p>
+            </div>
+
+            <!-- Result state -->
+            <div class="result-panel" id="resultPanel">
+                <div class="result-badge" id="riskBadge">—</div>
+                <div class="result-icon" id="resultIcon">—</div>
+                <div class="result-title" id="resultTitle">—</div>
+                <div class="result-prob" id="resultProb">—</div>
+                <div class="prob-bar-container">
+                    <div class="prob-bar-label">
+                        <span>Legitimate</span>
+                        <span>Fraudulent</span>
+                    </div>
+                    <div class="prob-bar">
+                        <div class="prob-bar-fill" id="probBarFill" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        Built with <a href="https://fastapi.tiangolo.com" target="_blank">FastAPI</a> &
+        <a href="https://scikit-learn.org" target="_blank">scikit-learn</a> ·
+        Dataset: <a href="https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud" target="_blank">Kaggle MLG-ULB</a>
+    </footer>
+</div>
+
+<!-- Error toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// =====================================================================
+//  CONFIGURATION
+// =====================================================================
+const API_URL = window.location.origin;
+const FEATURE_NAMES = ["Time", ...Array.from({length: 28}, (_, i) => `V${i + 1}`), "Amount"];
+
+// Sample data: a legitimate transaction and a fraud-like transaction
+const SAMPLE_DATA = {
+    legitimate: [
+        0, -1.3598071, -0.0727812, 2.5363467, 1.3781552, -0.3383208,
+        0.4623878, 0.2395986, 0.0986979, 0.3637870, 0.0907942,
+        -0.5515995, -0.6178009, -0.9913898, -0.3111694, 1.4681770,
+        -0.4704005, 0.2079712, 0.0257906, 0.4039930, 0.2514121,
+        -0.0183068, 0.2778376, -0.1104739, 0.0669281, 0.1285394,
+        -0.1891148, 0.1335584, 149.62
+    ],
+    fraudulent: [
+        406, -2.3122265, 1.9519920, -1.6098511, 3.9979055, -0.5221872,
+        -1.4265453, -2.5373871, 1.3916520, -2.7700839, -2.7724723,
+        3.2020300, -7.5636724, -3.5577880, -1.6139562, -3.9999790,
+        0.2862943, -0.1684740, 1.6127150, -1.0634538, 0.4855039,
+        -0.1815736, 0.5875039, -0.6572683, -2.7467960, 2.3964210,
+        2.3958640, 2.1553760, 239.93
+    ],
+};
+
+// =====================================================================
+//  DOM REFERENCES
+// =====================================================================
+const featureGrid   = document.getElementById("featureGrid");
+const form          = document.getElementById("predictionForm");
+const predictBtn    = document.getElementById("predictBtn");
+const sampleBtn     = document.getElementById("sampleBtn");
+const clearBtn      = document.getElementById("clearBtn");
+const waitingPanel  = document.getElementById("waitingPanel");
+const loadingPanel  = document.getElementById("loadingPanel");
+const resultPanel   = document.getElementById("resultPanel");
+const riskBadge     = document.getElementById("riskBadge");
+const resultIcon    = document.getElementById("resultIcon");
+const resultTitle   = document.getElementById("resultTitle");
+const resultProb    = document.getElementById("resultProb");
+const probBarFill   = document.getElementById("probBarFill");
+const toast         = document.getElementById("toast");
+
+const apiIndicator    = document.getElementById("apiIndicator");
+const apiStatusText   = document.getElementById("apiStatusText");
+const modelIndicator  = document.getElementById("modelIndicator");
+const modelStatusText = document.getElementById("modelStatusText");
+
+// =====================================================================
+//  BUILD FEATURE INPUTS
+// =====================================================================
+FEATURE_NAMES.forEach((name, idx) => {
+    const field = document.createElement("div");
+    field.className = "feature-field";
+    field.innerHTML = `
+        <label for="f${idx}">${name}</label>
+        <input type="number" step="any" id="f${idx}" name="${name}" placeholder="0.0">
+    `;
+    featureGrid.appendChild(field);
+});
+
+// =====================================================================
+//  HEALTH CHECK
+// =====================================================================
+async function checkHealth() {
+    try {
+        const res = await fetch(`${API_URL}/health`);
+        const data = await res.json();
+        apiIndicator.className = "indicator green";
+        apiStatusText.textContent = "API Online";
+
+        if (data.model_loaded) {
+            modelIndicator.className = "indicator green";
+            modelStatusText.textContent = "Model Loaded";
+        } else {
+            modelIndicator.className = "indicator red";
+            modelStatusText.textContent = "Model Not Trained";
+        }
+    } catch {
+        apiIndicator.className = "indicator red";
+        apiStatusText.textContent = "API Offline";
+        modelIndicator.className = "indicator red";
+        modelStatusText.textContent = "Unavailable";
+    }
+}
+checkHealth();
+setInterval(checkHealth, 15000);
+
+// =====================================================================
+//  FORM SUBMISSION
+// =====================================================================
+form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const features = FEATURE_NAMES.map((_, i) => {
+        const val = document.getElementById(`f${i}`).value;
+        return val === "" ? 0.0 : parseFloat(val);
+    });
+
+    showPanel("loading");
+
+    try {
+        const res = await fetch(`${API_URL}/predict`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ features }),
+        });
+
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.detail || `HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+        renderResult(data);
+    } catch (err) {
+        showPanel("waiting");
+        showToast(`❌ ${err.message}`);
+    }
+});
+
+// =====================================================================
+//  RENDER RESULT
+// =====================================================================
+function renderResult(data) {
+    const { prediction, fraud_probability, risk_level } = data;
+    const isFraud = prediction === "Fraudulent";
+    const riskClass = risk_level === "HIGH" ? "danger"
+                    : risk_level === "MEDIUM" ? "warning"
+                    : "safe";
+
+    // Badge
+    riskBadge.textContent = `${risk_level} Risk`;
+    riskBadge.className = `result-badge ${riskClass}`;
+
+    // Icon
+    resultIcon.textContent = isFraud ? "🚨" : "✅";
+
+    // Title
+    resultTitle.textContent = prediction;
+    resultTitle.className = `result-title ${riskClass}`;
+
+    // Probability
+    const pct = (fraud_probability * 100).toFixed(2);
+    resultProb.textContent = `Fraud probability: ${pct}%`;
+
+    // Bar
+    probBarFill.style.width = `${pct}%`;
+    probBarFill.className = `prob-bar-fill ${riskClass}`;
+
+    showPanel("result");
+}
+
+// =====================================================================
+//  PANEL SWITCHING
+// =====================================================================
+function showPanel(which) {
+    waitingPanel.classList.toggle("visible", which === "waiting");
+    loadingPanel.classList.toggle("visible", which === "loading");
+    resultPanel.classList.toggle("visible",  which === "result");
+}
+
+// =====================================================================
+//  SAMPLE DATA
+// =====================================================================
+let sampleToggle = false;
+sampleBtn.addEventListener("click", () => {
+    const data = sampleToggle ? SAMPLE_DATA.fraudulent : SAMPLE_DATA.legitimate;
+    sampleToggle = !sampleToggle;
+    FEATURE_NAMES.forEach((_, i) => {
+        document.getElementById(`f${i}`).value = data[i];
+    });
+    showPanel("waiting");
+});
+
+// =====================================================================
+//  CLEAR
+// =====================================================================
+clearBtn.addEventListener("click", () => {
+    form.reset();
+    showPanel("waiting");
+});
+
+// =====================================================================
+//  TOAST
+// =====================================================================
+function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add("visible");
+    setTimeout(() => toast.classList.remove("visible"), 4000);
+}
+</script>
+</body>
+</html>

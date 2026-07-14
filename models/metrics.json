@@ -1,0 +1,10 @@
+{
+  "best_model": "XGBoost",
+  "models": [
+    {
+      "model_name": "XGBoost",
+      "auc_roc": 0.9807131643866338,
+      "f1_score": 0.8958333333333334
+    }
+  ]
+}
